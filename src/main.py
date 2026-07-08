@@ -1,34 +1,47 @@
-"""
-Command line runner for the Music Recommender Simulation.
+from src.recommender import load_songs, recommend_songs
 
-This file helps you quickly run and test your recommender.
+def print_profile_results(profile_name, recommendations):
+    print("=" * 70)
+    print(f"🎯 RECOMMENDATIONS FOR: {profile_name.upper()}")
+    print("=" * 70)
+    for idx, rec in enumerate(recommendations, 1):
+        print(f"{idx}. '{rec['title']}' by {rec['artist']}")
+        print(f"   📊 Match Score: {rec['score']}")
+        print(f"   🔍 Reasons: {', '.join(rec['reasons'])}")
+        print("-" * 70)
+    print("\n")
 
-You will implement the functions in recommender.py:
-- load_songs
-- score_song
-- recommend_songs
-"""
-
-from recommender import load_songs, recommend_songs
-
-
-def main() -> None:
-    songs = load_songs("data/songs.csv") 
-
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
-
-    recommendations = recommend_songs(user_prefs, songs, k=5)
-
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
-        print()
-
+def main():
+    # Load songs from file
+    songs = load_songs()
+    print(f"📦 Loaded {len(songs)} tracks from data/songs.csv.\n")
+    
+    # Three clear, distinct user test profiles
+    profiles = {
+        "Chill Lofi Listener": {
+            "preferred_genre": "lofi",
+            "preferred_mood": "chill",
+            "target_energy": 0.40,
+            "target_tempo": 75
+        },
+        "High-Energy Pop/Rock Fan": {
+            "preferred_genre": "pop",
+            "preferred_mood": "intense",
+            "target_energy": 0.90,
+            "target_tempo": 135
+        },
+        "Walking Pace Afrobeats Listener": {
+            "preferred_genre": "afrobeats",
+            "preferred_mood": "encouraging",
+            "target_energy": 0.65,
+            "target_tempo": 68
+        }
+    }
+    
+    # Run recommendation generation for each test case
+    for profile_name, preferences in profiles.items():
+        top_recs = recommend_songs(preferences, songs, k=3)
+        print_profile_results(profile_name, top_recs)
 
 if __name__ == "__main__":
     main()
