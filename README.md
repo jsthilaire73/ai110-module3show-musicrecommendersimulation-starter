@@ -33,23 +33,23 @@ The recommender awards points to each song based on how closely it meets the use
 
 📦 Loaded 15 tracks from data/songs.csv.
 
-======================================================================
+
 🎯 RECOMMENDATIONS FOR: CHILL LOFI LISTENER
-======================================================================
+
 1. 'Midnight Coding' by LoRoom | Score: 4.95 | Reasons: genre match (+2.0), mood match (+1.0), energy proximity (+0.98), tempo proximity (+0.97)
 2. 'Library Rain' by Paper Lanterns | Score: 4.92 | Reasons: genre match (+2.0), mood match (+1.0), energy proximity (+0.95), tempo proximity (+0.97)
 3. 'Focus Flow' by LoRoom | Score: 3.95 | Reasons: genre match (+2.0), energy proximity (+1.0), tempo proximity (+0.95)
 
-======================================================================
+
 🎯 RECOMMENDATIONS FOR: HIP-HOP FAN
-======================================================================
+
 1. 'Gods Plan' by Drake | Score: 4.94 | Reasons: genre match (+2.0), mood match (+1.0), energy proximity (+0.97), tempo proximity (+0.97)
 2. 'First Class' by Jack Harlow | Score: 3.75 | Reasons: genre match (+2.0), energy proximity (+0.92), tempo proximity (+0.83)
 3. 'Industry Baby' by Lil Nas X | Score: 2.82 | Reasons: mood match (+1.0), energy proximity (+0.99), tempo proximity (+0.83)
 
-======================================================================
+
 🎯 RECOMMENDATIONS FOR: SYNTHWAVE FAN
-======================================================================
+
 1. 'Neon Horizon' by Laserhawk | Score: 5.0 | Reasons: genre match (+2.0), mood match (+1.0), energy proximity (+1.0), tempo proximity (+1.0)
 2. 'Turbo Drive' by CyberCorp | Score: 3.62 | Reasons: genre match (+2.0), energy proximity (+0.87), tempo proximity (+0.75)
 3. 'Techno Core' by CyberCorp | Score: 1.71 | Reasons: energy proximity (+0.8), tempo proximity (+0.91)
