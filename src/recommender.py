@@ -66,36 +66,32 @@ def score_song(user_prefs, song, mode="Standard"):
     return round(score, 2), reasons
 
 def recommend_songs(user_prefs, songs, k=3, mode="Standard"):
-    """Ranks and yields top recommendations while executing sequence duplicate artist filters."""
-    ranked_tracks = []
-    seen_artists = []
-
+    """
+    Ranks all songs, applies artist diversity penalties, and returns the top k recommendations.
+    """
+    # 1. Calculate all initial scores
+    all_scored = []
     for song in songs:
         base_score, reasons = score_song(user_prefs, song, mode)
-        track_entry = {
+        all_scored.append({
             "title": song["title"],
             "artist": song["artist"],
             "score": base_score,
             "reasons": list(reasons)
-        }
-        ranked_tracks.append(track_entry)
+        })
 
-    # Initial sorting breakdown
-    ranked_tracks.sort(key=lambda x: x["score"], reverse=True)
-
-    final_recommendations = []
-    for track in ranked_tracks:
-        if len(final_recommendations) >= k:
-            break
-            
-        # Filter Bubble Isolation Rule: Detect repeat artist sequences
+    # 2. Sort initially to identify top artists
+    all_scored.sort(key=lambda x: x["score"], reverse=True)
+    
+    # 3. Apply Diversity Penalty across the entire list
+    seen_artists = set()
+    for track in all_scored:
         if track["artist"] in seen_artists:
             track["score"] = round(track["score"] - 0.75, 2)
             track["reasons"].append("artist bubble penalty (-0.75)")
-            
-        seen_artists.append(track["artist"])
-        final_recommendations.append(track)
+        seen_artists.add(track["artist"])
 
-    # Secondary sorting validation sweep to guarantee accurate table ordering
-    final_recommendations.sort(key=lambda x: x["score"], reverse=True)
-    return final_recommendations
+    # 4. Final sort after penalties have been applied
+    all_scored.sort(key=lambda x: x["score"], reverse=True)
+    
+    return all_scored[:k]

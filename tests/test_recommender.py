@@ -64,3 +64,35 @@ def test_explain_recommendation_returns_non_empty_reasons():
     assert len(reasons) > 0
     assert isinstance(reasons[0], str)
     assert reasons[0].strip() != ""
+
+def test_diversity_penalty_applies():
+    """Verifies that the same artist receives a penalty in subsequent recommendations."""
+    user_prefs = {
+        "preferred_genre": "pop",
+        "preferred_mood": "happy",
+        "target_energy": 0.8,
+        "target_tempo": 120,
+        "target_danceability": 0.8
+    }
+    songs = make_small_songs_catalog()
+    # Both songs are by "Test Artist", second one should be penalized
+    results = recommend_songs(user_prefs, songs, k=2)
+    
+    # Check that the second track has the penalty reason
+    assert "artist bubble penalty (-0.75)" in results[1]["reasons"]
+
+def test_vibe_focused_mode_changes_scores():
+    """Verifies that Vibe-Focused mode produces different scores than Standard."""
+    user_prefs = {
+        "preferred_genre": "pop",
+        "preferred_mood": "happy",
+        "target_energy": 0.8,
+        "target_tempo": 120,
+        "target_danceability": 0.8
+    }
+    songs = make_small_songs_catalog()
+    
+    score_standard, _ = score_song(user_prefs, songs[0], mode="Standard")
+    score_vibe, _ = score_song(user_prefs, songs[0], mode="Vibe-Focused")
+    
+    assert score_standard != score_vibe

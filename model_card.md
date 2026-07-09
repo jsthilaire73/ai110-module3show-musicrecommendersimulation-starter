@@ -67,7 +67,7 @@ The initial simulation was significantly upgraded to move beyond static filterin
 
 * **Diversity & Artist Penalty Logic:** To counteract "filter bubbles," the system now utilizes a sequential history-tracking loop. If a specific artist occupies a top-ranked recommendation slot, subsequent tracks by that same creator receive a dynamic `-0.75` point deduction. This ensures that the user's feed remains varied and encourages broader discovery.
 * **Multi-Strategy Ranking Engine:** The engine now supports runtime strategy selection. Users can toggle between **"Standard Mode"** (which prioritizes strict categorical genre/mood matching) and **"Vibe-Focused Mode"** (which down-weights text tags to elevate continuous sonic proximity metrics). This is achieved through a functional Strategy Pattern implementation that dynamically swaps scoring weight matrices without modifying the core execution loop.
-* **Multi-Dimensional Feature Integration:** The scoring logic was expanded to process a full vector of audio properties. Beyond basic tags, the engine now calculates continuous proximity distances for `energy`, `tempo_bpm`, `valence`, `danceability`, and `acousticness`, allowing the model to perform spatial similarity matching rather than relying solely on keyword matching.
+* **Multi-Dimensional Feature Integration:** The scoring logic was expanded to process a full vector of audio properties. Beyond basic tags, the engine now calculates continuous proximity distances for `energy`, `tempo_bpm`, and `danceability`, allowing the model to perform spatial similarity matching rather than relying solely on keyword matching.
 
 ---
 
