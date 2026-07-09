@@ -63,6 +63,7 @@ if mode == "Vibe-Focused":
 
     w_genre, w_mood, w_energy, w_tempo, w_dance = 0.5, 1.5, 2.5, 1.5, 0.5
 else: 
+
     # Default Standard Mode Allocation
     w_genre, w_mood, w_energy, w_tempo, w_dance = 2.0, 1.0, 1.0, 1.0, 0.5
 
