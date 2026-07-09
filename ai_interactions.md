@@ -44,8 +44,11 @@ I asked how to handle dynamic weight adjustment vectors across multiple recommen
 The strategy pattern is implemented functionally inside `src/recommender.py` within the `score_song()` method. It uses an `if/else` statement conditioned on the `mode` parameter:
 
 if mode == "Vibe-Focused":
+
     w_genre, w_mood, w_energy, w_tempo, w_dance = 0.5, 1.5, 2.5, 1.5, 0.5
+    
 else:
+
     # Default Standard Mode Allocation
     w_genre, w_mood, w_energy, w_tempo, w_dance = 2.0, 1.0, 1.0, 1.0, 0.5
 
