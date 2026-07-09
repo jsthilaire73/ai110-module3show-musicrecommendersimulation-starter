@@ -1,70 +1,101 @@
 import csv
+import os
 
-def load_songs(filepath="data/songs.csv"):
-    """Reads the CSV file of songs and returns a list of dictionaries with correctly cast data types."""
+def load_songs():
+    """Loads and sanitizes track catalog data from the CSV database."""
     songs = []
-    with open(filepath, mode='r', encoding='utf-8') as f:
+    csv_path = os.path.join("data", "songs.csv")
+    if not os.path.exists(csv_path):
+        return []
+        
+    with open(csv_path, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             songs.append({
                 "id": int(row["id"]),
-                "title": row["title"],
-                "artist": row["artist"],
+                "title": row["title"].strip(),
+                "artist": row["artist"].strip(),
                 "genre": row["genre"].strip().lower(),
+                "whitespace_genre": row.get("whitespace_genre", row["genre"]).strip().lower(),
                 "mood": row["mood"].strip().lower(),
                 "energy": float(row["energy"]),
-                "tempo_bpm": int(row["tempo_bpm"]),
+                "tempo_bpm": float(row["tempo_bpm"]),
                 "valence": float(row["valence"]),
                 "danceability": float(row["danceability"]),
                 "acousticness": float(row["acousticness"])
             })
     return songs
 
-def score_song(user_prefs, song):
-    """
-    Computes a recommendation match score for a single song against a user's taste profile.
-    Returns a tuple: (total_score, list_of_reasons)
-    """
+def score_song(user_prefs, song, mode="Standard"):
+    """Calculates granular match values using Strategy-specific weight configurations."""
     score = 0.0
     reasons = []
-    
-    # 1. Genre Match (+2.0 points)
-    if user_prefs.get("preferred_genre").lower() == song["genre"]:
-        score += 2.0
-        reasons.append("genre match (+2.0)")
-        
-    # 2. Mood Match (+1.0 point)
-    if user_prefs.get("preferred_mood").lower() == song["mood"]:
-        score += 1.0
-        reasons.append("mood match (+1.0)")
-        
-    # 3. Energy Similarity (Calculated via distance from target preference)
-    energy_diff = abs(user_prefs.get("target_energy") - song["energy"])
-    energy_score = round(max(0, 1.0 - energy_diff), 2)
-    score += energy_score
-    reasons.append(f"energy proximity (+{energy_score})")
-    
-    # 4. Tempo Proximity (Calculated over an assumed maximum range of 100 BPM)
-    tempo_diff = abs(user_prefs.get("target_tempo") - song["tempo_bpm"])
-    tempo_score = round(max(0, 1.0 - (tempo_diff / 100.0)), 2)
-    score += tempo_score
-    reasons.append(f"tempo proximity (+{tempo_score})")
+
+    # Dynamic Weight Matrices via Strategy Design Pattern
+    if mode == "Vibe-Focused":
+        w_genre, w_mood, w_energy, w_tempo, w_dance = 0.5, 1.5, 2.5, 1.5, 0.5
+    else:  # Default Standard Mode Allocation
+        w_genre, w_mood, w_energy, w_tempo, w_dance = 2.0, 1.0, 1.0, 1.0, 0.5
+
+    # 1. Categorical Genre Match
+    if song["genre"] == user_prefs["preferred_genre"] or song["whitespace_genre"] == user_prefs["preferred_genre"]:
+        score += w_genre
+        reasons.append(f"genre match (+{w_genre})")
+
+    # 2. Categorical Mood Match
+    if song["mood"] == user_prefs["preferred_mood"]:
+        score += w_mood
+        reasons.append(f"mood match (+{w_mood})")
+
+    # 3. Continuous Energy Proximity (Inverse Absolute Delta)
+    energy_prox = 1.0 - abs(song["energy"] - user_prefs["target_energy"])
+    score += energy_prox * w_energy
+    reasons.append(f"energy proximity (+{energy_prox * w_energy:.2f})")
+
+    # 4. Continuous Tempo Proximity (Normalized Scaling Check)
+    tempo_delta = abs(song["tempo_bpm"] - user_prefs["target_tempo"]) / user_prefs["target_tempo"]
+    tempo_prox = max(0.0, 1.0 - tempo_delta)
+    score += tempo_prox * w_tempo
+    reasons.append(f"tempo proximity (+{tempo_prox * w_tempo:.2f})")
+
+    # 5. Continuous Danceability Proximity
+    dance_prox = 1.0 - abs(song["danceability"] - user_prefs["target_danceability"])
+    score += dance_prox * w_dance
+    reasons.append(f"danceability match (+{dance_prox * w_dance:.2f})")
 
     return round(score, 2), reasons
 
-def recommend_songs(user_prefs, songs, k=3):
-    """Loops through all songs, scores them, and returns top k results sorted high-to-low."""
-    scored_list = []
-    
+def recommend_songs(user_prefs, songs, k=3, mode="Standard"):
+    """Ranks and yields top recommendations while executing sequence duplicate artist filters."""
+    ranked_tracks = []
+    seen_artists = []
+
     for song in songs:
-        total_score, reasons = score_song(user_prefs, song)
-        scored_list.append({
+        base_score, reasons = score_song(user_prefs, song, mode)
+        track_entry = {
             "title": song["title"],
             "artist": song["artist"],
-            "score": total_score,
-            "reasons": reasons
-        })
-        
-    # Sort from highest score to lowest score using sorted() to keep original list safe
-    sorted_recommendations = sorted(scored_list, key=lambda x: x["score"], reverse=True)
-    return sorted_recommendations[:k]
+            "score": base_score,
+            "reasons": list(reasons)
+        }
+        ranked_tracks.append(track_entry)
+
+    # Initial sorting breakdown
+    ranked_tracks.sort(key=lambda x: x["score"], reverse=True)
+
+    final_recommendations = []
+    for track in ranked_tracks:
+        if len(final_recommendations) >= k:
+            break
+            
+        # Filter Bubble Isolation Rule: Detect repeat artist sequences
+        if track["artist"] in seen_artists:
+            track["score"] = round(track["score"] - 0.75, 2)
+            track["reasons"].append("artist bubble penalty (-0.75)")
+            
+        seen_artists.append(track["artist"])
+        final_recommendations.append(track)
+
+    # Secondary sorting validation sweep to guarantee accurate table ordering
+    final_recommendations.sort(key=lambda x: x["score"], reverse=True)
+    return final_recommendations

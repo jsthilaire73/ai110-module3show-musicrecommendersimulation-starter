@@ -2,7 +2,9 @@
 
 ## 1. Model Name  
 
-**VibeFinder 1.0** ---
+**VibeFinder 1.0**
+
+---
 
 ## 2. Intended Use  
 
@@ -59,12 +61,13 @@ We systematically audited the terminal logs to make sure the math held up and th
 
 ---
 
-## 8. Future Work  
+## 8. Implemented Advanced Features
 
-If development on this system continues, the next structural upgrades would focus on:
-* **Implementing a Diversity or Artist Penalty:** Point deductions would be dynamically applied to songs by an artist if they already occupy an upper slot in the top recommendation list, preventing a single artist from sweeping the entire board.
-* **Multi-Strategy Ranking Selection:** Allowing users to switch modes in the application terminal—such as toggling between a "Genre-First Strategy" or a "Vibe-Focused Strategy" that down-weights text tags to elevate energy/tempo matches.
-* **Advanced Feature Metrics:** Factoring the existing `valence` (emotional brightness), `danceability`, and `acousticness` columns directly into the core mathematical scoring loop to build a multi-dimensional recommendation profile.
+The initial simulation was significantly upgraded to move beyond static filtering, incorporating the following advanced capabilities:
+
+* **Diversity & Artist Penalty Logic:** To counteract "filter bubbles," the system now utilizes a sequential history-tracking loop. If a specific artist occupies a top-ranked recommendation slot, subsequent tracks by that same creator receive a dynamic `-0.75` point deduction. This ensures that the user's feed remains varied and encourages broader discovery.
+* **Multi-Strategy Ranking Engine:** The engine now supports runtime strategy selection. Users can toggle between **"Standard Mode"** (which prioritizes strict categorical genre/mood matching) and **"Vibe-Focused Mode"** (which down-weights text tags to elevate continuous sonic proximity metrics). This is achieved through a functional Strategy Pattern implementation that dynamically swaps scoring weight matrices without modifying the core execution loop.
+* **Multi-Dimensional Feature Integration:** The scoring logic was expanded to process a full vector of audio properties. Beyond basic tags, the engine now calculates continuous proximity distances for `energy`, `tempo_bpm`, `valence`, `danceability`, and `acousticness`, allowing the model to perform spatial similarity matching rather than relying solely on keyword matching.
 
 ---
 
